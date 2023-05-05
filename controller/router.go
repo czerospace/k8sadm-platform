@@ -19,11 +19,12 @@ func (r *router) InitApiRouter(g *gin.Engine) {
 			"msg":  "testapi success!",
 			"data": nil,
 		})
-	})
-	g.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"code":    http.StatusOK,
-			"success": true,
-		})
-	})
+	}).
+		GET("/health", func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{
+				"code":    http.StatusOK,
+				"success": true,
+			})
+		}).
+		GET("/api/k8s/pods", Pod.GetPods)
 }
