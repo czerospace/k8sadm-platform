@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/wonderivan/logger"
@@ -42,8 +44,8 @@ func (d *deployment) fromCells(cells []DataCell) []appsv1.Deployment {
 func (d *deployment) GetDeployments(client *kubernetes.Clientset, filterName, namespace string, limit, page int) (deploymentResp *DeploymentResp, err error) {
 	deploymentList, err := client.AppsV1().Deployments(namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("获取Deployment列表失败, %v\n", err))
-		return nil, errors.New(fmt.Sprintf("获取Deployment列表失败, %v\n", err))
+		logger.Error(fmt.Sprintf("获取Deployment列表失败, %v", err))
+		return nil, errors.New(fmt.Sprintf("获取Deployment列表失败, %v", err))
 	}
 	//实例化dataSelector对象
 	selectableData := &dataSelector{
@@ -56,10 +58,10 @@ func (d *deployment) GetDeployments(client *kubernetes.Clientset, filterName, na
 			},
 		},
 	}
-	//先过滤
+	// 先过滤
 	filtered := selectableData.Filter()
 	total := len(filtered.GenericDataList)
-	//再排序和分页
+	// 再排序和分页
 	data := filtered.Sort().Paginate()
 
 	deployments := d.fromCells(data.GenericDataList)
@@ -70,42 +72,44 @@ func (d *deployment) GetDeployments(client *kubernetes.Clientset, filterName, na
 	}, nil
 }
 
-// 获取deployment详情
+// GetDeploymentDetail 获取 deployment 详情
 func (d *deployment) GetDeploymentDetail(client *kubernetes.Clientset, deploymentName, namespace string) (deployment *appsv1.Deployment, err error) {
 	deployment, err = client.AppsV1().Deployments(namespace).Get(context.TODO(), deploymentName, metav1.GetOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("获取Deployment详情失败, %v\n", err))
-		return nil, errors.New(fmt.Sprintf("获取Deployment详情失败, %v\n", err))
+		logger.Error(fmt.Sprintf("获取Deployment详情失败, %v", err))
+		return nil, errors.New(fmt.Sprintf("获取Deployment详情失败, %v", err))
 	}
 
 	return deployment, nil
 }
 
-// 更新deployment
+// UpdateDeployment 更新 deployment
 func (d *deployment) UpdateDeployment(client *kubernetes.Clientset, namespace, content string) (err error) {
 	var deploy = &appsv1.Deployment{}
 
 	err = json.Unmarshal([]byte(content), deploy)
 	if err != nil {
-		logger.Error(fmt.Sprintf("反序列化失败, %v\n", err))
-		return errors.New(fmt.Sprintf("反序列化失败, %v\n", err))
+		logger.Error(fmt.Sprintf("反序列化失败, %v", err))
+		return errors.New(fmt.Sprintf("反序列化失败, %v", err))
 	}
 
 	_, err = client.AppsV1().Deployments(namespace).Update(context.TODO(), deploy, metav1.UpdateOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("更新Deployment失败, %v\n", err))
-		return errors.New(fmt.Sprintf("更新Deployment失败, %v\n", err))
+		logger.Error(fmt.Sprintf("更新Deployment失败, %v", err))
+		return errors.New(fmt.Sprintf("更新Deployment失败, %v", err))
 	}
 	return nil
 }
 
-// 删除deployment
+// DeleteDeployment 删除 deployment
 func (d *deployment) DeleteDeployment(client *kubernetes.Clientset, deploymentName, namespace string) (err error) {
 	err = client.AppsV1().Deployments(namespace).Delete(context.TODO(), deploymentName, metav1.DeleteOptions{})
 	if err != nil {
-		logger.Error(fmt.Sprintf("删除Deployment失败, %v\n", err))
-		return errors.New(fmt.Sprintf("删除Deployment失败, %v\n", err))
+		logger.Error(fmt.Sprintf("删除Deployment失败, %v", err))
+		return errors.New(fmt.Sprintf("删除Deployment失败, %v", err))
 	}
 
 	return nil
 }
+
+// 修改 Deployment 副本数
