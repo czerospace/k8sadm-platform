@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -133,4 +134,15 @@ func (p podCell) GetCreation() time.Time {
 // GetName 获取 名称
 func (p podCell) GetName() string {
 	return p.Name
+}
+
+// 定义 deploymentCell 类型，实现两个方法 GetCreation GetName，可进行类型转换
+type deploymentCell appsv1.Deployment
+
+func (d deploymentCell) GetCreation() time.Time {
+	return d.CreationTimestamp.Time
+}
+
+func (d deploymentCell) GetName() string {
+	return d.Name
 }
