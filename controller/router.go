@@ -13,8 +13,8 @@ var Router router
 type router struct{}
 
 // InitApiRouter 初始化路由，创建测试api接口
-func (r *router) InitApiRouter(g *gin.Engine) {
-	g.GET("/testapi", func(ctx *gin.Context) {
+func (r *router) InitApiRouter(ctx *gin.Engine) {
+	ctx.GET("/testapi", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"msg":  "testapi success!",
 			"data": nil,
@@ -26,5 +26,10 @@ func (r *router) InitApiRouter(g *gin.Engine) {
 				"success": true,
 			})
 		}).
-		GET("/api/k8s/pods", Pod.GetPods)
+		GET("/api/k8s/pods", Pod.GetPods).
+		GET("/api/k8s/pod/detail", Pod.GetPodDetail).
+		DELETE("/api/k8s/pod/del", Pod.DeletePod).
+		PUT("/api/k8s/pod/update", Pod.UpdatePod).
+		GET("/api/k8s/pod/container", Pod.GetPodContainer).
+		GET("/api/k8s/pod/log", Pod.GetPodLog)
 }

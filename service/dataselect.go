@@ -115,6 +115,9 @@ func (d *dataSelector) Paginate() *dataSelector {
 	if len(d.GenericDataList) < endIndex {
 		endIndex = len(d.GenericDataList)
 	}
+	if startIndex > endIndex {
+		return d
+	}
 	d.GenericDataList = d.GenericDataList[startIndex:endIndex]
 	return d
 }

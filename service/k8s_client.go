@@ -25,7 +25,7 @@ type k8s struct {
 func (k *k8s) GetClient(cluster string) (*kubernetes.Clientset, error) {
 	client, ok := k.ClientMap[cluster]
 	if !ok {
-		return nil, errors.New(fmt.Sprintf("集群:%s不存在，无法获取client\n", cluster))
+		return nil, errors.New(fmt.Sprintf("集群:%s不存在，无法获取client", cluster))
 	}
 	return client, nil
 }
@@ -44,11 +44,11 @@ func (k *k8s) Init() {
 	for key, value := range mp {
 		conf, err := clientcmd.BuildConfigFromFlags("", value)
 		if err != nil {
-			panic(fmt.Sprintf("集群%s:创建K8s配置失败 %v\n", key, err))
+			panic(fmt.Sprintf("集群%s:创建K8s配置失败 %v", key, err))
 		}
 		clientSet, err := kubernetes.NewForConfig(conf)
 		if err != nil {
-			panic(fmt.Sprintf("集群%s:创建K8sClient失败 %v\n", key, err))
+			panic(fmt.Sprintf("集群%s:创建K8sClient失败 %v", key, err))
 		}
 		k.ClientMap[key] = clientSet
 		logger.Info(fmt.Sprintf("集群%s:创建K8sClient成功", key))
