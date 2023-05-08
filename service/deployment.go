@@ -132,7 +132,7 @@ func (d *deployment) DeleteDeployment(client *kubernetes.Clientset, deploymentNa
 	return nil
 }
 
-// 修改Deployment副本数
+// ScaleDeployment 修改 Deployment 副本数
 func (d *deployment) ScaleDeployment(client *kubernetes.Clientset, deploymentName, namespace string, scaleNum int) (replica int32, err error) {
 	//获取 aotuscalingv1.Scale 类型的对象，能点出当前的副本数
 	scale, err := client.AppsV1().Deployments(namespace).GetScale(context.TODO(), deploymentName, metav1.GetOptions{})
@@ -151,7 +151,7 @@ func (d *deployment) ScaleDeployment(client *kubernetes.Clientset, deploymentNam
 	return newScale.Spec.Replicas, nil
 }
 
-// 重启 Deployment
+// RestartDeployment 重启 Deployment
 func (d *deployment) RestartDeployment(client *kubernetes.Clientset, deploymentName, namespace string) (err error) {
 	// 通过 patch 方法实现重启
 	// 此功能等同于 kubectl 命令
@@ -191,7 +191,7 @@ func (d *deployment) RestartDeployment(client *kubernetes.Clientset, deploymentN
 	return nil
 }
 
-// 创建 Deployment
+// CreateDeployment 创建 Deployment
 func (d *deployment) CreateDeployment(client *kubernetes.Clientset, data *DeployCreate) (err error) {
 	// 将 data 中的属性组装成 appsv1.Deployment 对象
 	deployment := &appsv1.Deployment{
@@ -283,7 +283,7 @@ func (d *deployment) CreateDeployment(client *kubernetes.Clientset, data *Deploy
 			corev1.ResourceCPU:    resource.MustParse(data.Cpu),
 			corev1.ResourceMemory: resource.MustParse(data.Memory),
 		}
-	//创建deployment
+	//创建 deployment
 	_, err = client.AppsV1().Deployments(data.Namespace).Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
 		logger.Error(fmt.Sprintf("创建Deployment失败, %v\n", err))
